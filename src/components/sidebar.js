@@ -1,15 +1,22 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Sidebar () {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const menuClasses = (path) =>
+        `block w-full text-left mb-2 text-sm font-semibold px-5 py-2 rounded-lg ${
+            location.pathname === path ? "bg-[#4dae37] text-white" : "bg-white text-black hover:bg-gray-100"
+        }`;
+
     return (
         <aside className="w-64 bg-white text-black p-4 border-r border-gray-200">
                 <h2 className="text-2xl font-bold mb-6">Admin Panel</h2>
                 <nav className="space-y-2">
-                    <button className="block w-full text-left mb-2 text-sm font-semibold bg-[#4dae37] text-white px-5 py-2 rounded-lg hover:bg-green-700" onClick={() => navigate("/admin/doctors")}>
+                    <button className={menuClasses("/admin/doctors")} onClick={() => navigate("/admin/doctors")}>
                         Doctors
                     </button>
-                    <button className="block w-full text-left mb-2 text-sm font-semibold">
+                    <button className={menuClasses("/admin/slots")} onClick={() => navigate("/admin/slots")}>
                         Availability
                     </button>
                 </nav>

@@ -1,3 +1,7 @@
 .homeBannerBackground {
   background: linear-gradient(180deg, rgb(249, 252, 249) 0%, rgba(241,250,238,1) 100%);
 }
+
+.react-datepicker-wrapper {
+  width: 100%;
+}
