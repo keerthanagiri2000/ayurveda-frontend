@@ -20,7 +20,7 @@ function App() {
           {/* Admin Module */}
           <Route path='/admin/doctors' element = {<DoctorsList />} />
           <Route path='/admin/add_doctor' element = {<AddDoctor />} />
-          <Route path='/admin/edit_doctor' element = {<EditDoctor /> } /> 
+          <Route path='/admin/edit_doctor/:id' element = {<EditDoctor /> } /> 
           <Route path='/admin/slots' element = {<SlotList />} />
           <Route path='/admin/add_slot' element = {<AddSlot />} />
           <Route path='/admin/edit_slot' element = {<EditSlot />} />
