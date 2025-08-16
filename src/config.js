@@ -7,6 +7,11 @@ const DOCTORS = {
     GET: (id) => `${API_BASE_URL}/doctors/${id}`,
     CREATE: `${API_BASE_URL}/doctors`,
     UPDATE: (id) => `${API_BASE_URL}/doctors/${id}`,
+    GET_ACTIVE_DOCTORS: `${API_BASE_URL}/doctors/active`,
 };
 
-export { DOCTORS };
+const SLOT = {
+    CREATE: `${API_BASE_URL}/slots`,
+    LIST: (page, limit) => `${API_BASE_URL}/slots?page=${page}&limit=${limit}`,
+}
+export { DOCTORS, SLOT };
