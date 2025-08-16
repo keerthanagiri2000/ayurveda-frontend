@@ -8,6 +8,7 @@ const DOCTORS = {
     CREATE: `${API_BASE_URL}/doctors`,
     UPDATE: (id) => `${API_BASE_URL}/doctors/${id}`,
     GET_ACTIVE_DOCTORS: `${API_BASE_URL}/doctors/active`,
+    GET_ACTIVE_DOCTORS_LIST: (page, limit) => `${API_BASE_URL}/doctors/active/list?page=${page}&limit=${limit}`,
 };
 
 const SLOT = {
