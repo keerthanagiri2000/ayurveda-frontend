@@ -4,8 +4,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import { SLOT } from "../config";
 import { formatSlotDate } from "../utils/formatSlotDate";
 import { formatDateForAPI } from "../utils/formatDateForAPI";
+import { useNavigate } from "react-router-dom";
 
 export default function AppointmentModal({ doctor, show, onClose }) {
+  const navigate = useNavigate()
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [slots, setSlots] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
@@ -34,11 +36,16 @@ export default function AppointmentModal({ doctor, show, onClose }) {
 
   useEffect(() => {
     fetchSlots()
-  }, [doctor, selectedDate])
+  }, [doctor, selectedDate]);
 
+  const handleNextStep = async (slotId) => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
 
-  const handleConfirmStep = async (slotId) => {
-    if (!showOtp) {
+    try {
       const res = await fetch(SLOT.LOCK_SLOT(slotId), {
         method: "POST",
         headers: {
@@ -53,15 +60,25 @@ export default function AppointmentModal({ doctor, show, onClose }) {
       }
 
       setShowOtp(true);
-      return;
-    } else {
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+
+  const handleConfirmAppointment = () => {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
       if (otp === "1234") {
         alert("Appointment booked successfully");
         onClose();
       } else {
         alert("Invalid OTP, try again");
       }
-    }
   };
 
   if (!show) return null;
@@ -152,7 +169,7 @@ export default function AppointmentModal({ doctor, show, onClose }) {
             <div className="flex justify-end mt-4">
               <button
                 disabled={selectedTime === null}
-                onClick={() => handleConfirmStep(selectedTime)}
+                onClick={() => handleNextStep(selectedTime)}
                 className="bg-green-600 text-white px-4 py-2 rounded-md disabled:opacity-50"
               >
                 Next Step
@@ -184,7 +201,7 @@ export default function AppointmentModal({ doctor, show, onClose }) {
             />
 
             <button
-            onClick={handleConfirmStep}
+            onClick={handleConfirmAppointment}
             className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
             >
             Confirm Appointment

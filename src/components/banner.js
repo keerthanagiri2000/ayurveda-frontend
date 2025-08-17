@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import {Link} from "react-router-dom";
+
 export default function Banner () {
     const images = [
     "/img-1.jpeg",
@@ -8,12 +11,41 @@ export default function Banner () {
     "/img-6.jpeg",
   ];
 
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    const userData = localStorage.getItem("user");
+
+    if (token && userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
+  
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    setUser(null);
+  };
+
     return (
     <div className="relative w-full h-[80vh] mb-6">
         <div className='homeBannerBackground py-6 px-20 flex flex-col absolute inset-0 z-10'>
             <div className="flex justify-between ltems-center">
                 <h1 className='text-xl font-semibold text-green-800'>Home</h1>
-                <button className='bg-[#4dae37] text-white rounded-lg px-4 py-1 hover:bg-green-700'>Sign In</button>
+                {user ? (
+                    <div className="flex items-center gap-4">
+                        <span className="font-semibold">Hi, {user.userName}</span>
+                        <button onClick={handleLogout} className="bg-red-500 text-white px-3 py-1 rounded">Logout</button>
+                    </div>
+
+                ) : (
+                    <Link to="/login">
+                        <button className='bg-[#4dae37] text-white rounded-lg px-4 py-1 hover:bg-green-700'>
+                            Sign In
+                        </button>
+                    </Link>  
+                )}
             </div>
             
             <div className="flex items-center gap-12">

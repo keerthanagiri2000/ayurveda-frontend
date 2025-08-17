@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { DOCTORS } from "../config";
 import AppointmentModal from "./appointmentModal";
+import { useNavigate } from "react-router-dom";
 
 export default function DoctorsList() {
+    const navigate = useNavigate();
     const [doctors, setDoctorData] = useState([]);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -15,6 +17,11 @@ export default function DoctorsList() {
     }, []);
 
     const handleBookAppointment = (doctor) => {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
      setSelectedDoctor(doctor);
      setShowModal(true);
     };
