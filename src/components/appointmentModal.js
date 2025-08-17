@@ -1,21 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { SLOT } from "../config";
+import { formatSlotDate } from "../utils/formatSlotDate";
+import { formatDateForAPI } from "../utils/formatDateForAPI";
 
 export default function AppointmentModal({ doctor, show, onClose }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [slots, setSlots] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
   const [showOtp, setShowOtp] = useState(false);
   const [otp, setOtp] = useState("");
 
-  // Mock slots
-  const slots = [
-    { start: "09:00 AM", end: "09:15 AM" },
-    { start: "09:15 AM", end: "09:30 AM" },
-    { start: "09:30 AM", end: "09:45 AM" },
-    { start: "09:45 AM", end: "10:00 AM" },
-    { start: "10:00 AM", end: "10:15 AM" },
-  ];
+   useEffect(() => {
+    if (show) {
+      setSelectedDate(new Date());
+      setSelectedTime(null);
+      setShowOtp(false);
+      setOtp("");
+    }
+  }, [show, doctor]);
+
+  const fetchSlots = async () => {
+    try {
+        const formattedDate = formatDateForAPI(selectedDate);
+        const res = await fetch(SLOT.AVAILABLE_DOCTOR_SLOTS(doctor._id, formattedDate))
+        const data = await res.json();
+        setSlots(data.data)
+    } catch (error) {
+        console.log(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchSlots()
+  }, [doctor, selectedDate])
+
 
   const handleConfirmStep = () => {
     if (!showOtp) {
@@ -61,37 +81,54 @@ export default function AppointmentModal({ doctor, show, onClose }) {
               </div>
 
               {/* Time slots */}
-              <div>
+             <div>
                 <h3 className="font-medium mb-2">Pick a time</h3>
                 <div className="flex flex-col gap-2">
-                  {slots.map((slot, idx) => (
-                    <label
-                      key={idx}
-                      className={`border rounded-md px-3 py-2 cursor-pointer ${
-                        selectedTime === idx ? "bg-green-600 text-white" : ""
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="slot"
-                        className="hidden"
-                        onChange={() => setSelectedTime(idx)}
-                      />
-                      {slot.start} - {slot.end}
-                    </label>
-                  ))}
+                    {slots.length > 0 ? (
+                    slots.map((slot) => {
+                        const isBooked = slot.booked === true;
+
+                        return (
+                        <label
+                            key={slot._id}
+                            className={`border rounded-md px-3 py-2 cursor-pointer 
+                            ${selectedTime === slot._id ? "bg-green-600 text-white" : ""}
+                            ${isBooked ? "bg-gray-200 text-gray-500 cursor-not-allowed" : ""}
+                            `}
+                        >
+                            <input
+                            type="radio"
+                            name="slot"
+                            className="hidden"
+                            disabled={isBooked}
+                            onChange={() => setSelectedTime(slot._id)}
+                            />
+                            {formatSlotDate(slot.startTime)} - {formatSlotDate(slot.endTime)}
+                            {isBooked && " (Booked)"}
+                        </label>
+                        );
+                    })
+                    ) : (
+                    <p className="text-gray-500 italic">No slots available for this day</p>
+                    )}
                 </div>
-              </div>
+                </div>
             </div>
 
             {/* Summary */}
             <div className="mt-4 p-3 border rounded-md bg-gray-50">
               <p className="text-sm text-gray-600">Scheduling</p>
               {selectedTime !== null ? (
-                <p className="font-medium">
-                  {selectedDate.toLocaleDateString()} —{" "}
-                  {slots[selectedTime].start} to {slots[selectedTime].end}
-                </p>
+                (() => {
+                    const slot = slots.find((s) => s._id === selectedTime);
+                    if(!slot) return <p className="text-gray-400">Select a time slot</p>;
+                    return (
+                        <p className="font-medium">
+                            {selectedDate.toLocaleDateString()} — {" "}
+                            {formatSlotDate(slot.startTime)} to {formatSlotDate(slot.endTime)}
+                        </p>
+                    )
+                })()
               ) : (
                 <p className="text-gray-400">Select a time slot</p>
               )}
@@ -111,24 +148,31 @@ export default function AppointmentModal({ doctor, show, onClose }) {
           <>
             {/* OTP Step */}
             <p className="mb-2 text-gray-600">
-              Enter OTP to confirm your booking for <br />
-              <b>
-                {selectedDate.toLocaleDateString()} —{" "}
-                {slots[selectedTime].start} to {slots[selectedTime].end}
-              </b>
+                Enter OTP to confirm your booking for <br />
+                <b>
+                    {(() => {
+                    const slot = slots.find((s) => s._id === selectedTime);
+                    if (!slot) return "No slot selected";
+                    return `${selectedDate.toLocaleDateString()} — ${formatSlotDate(
+                        slot.startTime
+                    )} to ${formatSlotDate(slot.endTime)}`;
+                    })()}
+                </b>
             </p>
+
             <input
-              type="text"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              placeholder="Enter OTP"
-              className="w-full border rounded-md p-2 mb-3"
+            type="text"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            placeholder="Enter OTP"
+            className="w-full border rounded-md p-2 mb-3"
             />
+
             <button
-              onClick={handleConfirmStep}
-              className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
+            onClick={handleConfirmStep}
+            className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
             >
-              Confirm Appointment
+            Confirm Appointment
             </button>
           </>
         )}

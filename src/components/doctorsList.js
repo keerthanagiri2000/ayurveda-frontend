@@ -70,7 +70,7 @@ export default function DoctorsList() {
           ))}
         </div>
       </div>
-      
+
        <AppointmentModal
         doctor={selectedDoctor}
         show={showModal}
