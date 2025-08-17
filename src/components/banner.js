@@ -36,6 +36,9 @@ export default function Banner () {
                 {user ? (
                     <div className="flex items-center gap-4">
                         <span className="font-semibold">Hi, {user.userName}</span>
+                        <Link to="/appointment_dashboard" className="text-lg font-semibold text-green-700 cursor-pointer">
+                          Dashboard
+                        </Link>
                         <button onClick={handleLogout} className="bg-red-500 text-white px-3 py-1 rounded">Logout</button>
                     </div>
 

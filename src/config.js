@@ -25,5 +25,7 @@ const AUTH = {
 
 const APPOINTMENT = {
     CREATE: `${API_BASE_URL}/appointment`,
+    DASHBOARD_LIST: (userId, status) => `${API_BASE_URL}/appointment/user/${userId}?status=${status}`,
+    CANCEL: (id) => `${API_BASE_URL}/appointments/${id}/cancel`,
 }
 export { DOCTORS, SLOT, AUTH, APPOINTMENT };

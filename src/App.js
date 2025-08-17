@@ -11,6 +11,7 @@ const EditSlot = lazy(() => import('./pages/admin/editSlot'));
 const EditDoctor = lazy(() => import('./pages/admin/editDoctor'));
 const Register = lazy(() => import('./pages/register'));
 const Login = lazy(() => import('./pages/login'));
+const AppointmentDashboard = lazy(() => import('./pages/appointmentDashboard'));
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path='/' element = {<Home />} />
           <Route path='/register' element = {<Register />} />
           <Route path='/login' element = {<Login />} />
+          <Route path='/appointment_dashboard' element = {<AppointmentDashboard />} />
 
           {/* Admin Module */}
           <Route path='/admin/doctors' element = {<DoctorsList />} />
