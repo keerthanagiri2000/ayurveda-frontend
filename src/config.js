@@ -15,5 +15,6 @@ const SLOT = {
     CREATE: `${API_BASE_URL}/slots`,
     LIST: (page, limit) => `${API_BASE_URL}/slots?page=${page}&limit=${limit}`,
     AVAILABLE_DOCTOR_SLOTS: (doctorId, date) => `${API_BASE_URL}/slots/available/${doctorId}?date=${date}`,
+    LOCK_SLOT: (id) => `${API_BASE_URL}/slots/${id}/lock`,
 }
 export { DOCTORS, SLOT };

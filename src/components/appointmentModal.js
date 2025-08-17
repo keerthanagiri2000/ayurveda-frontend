@@ -37,9 +37,23 @@ export default function AppointmentModal({ doctor, show, onClose }) {
   }, [doctor, selectedDate])
 
 
-  const handleConfirmStep = () => {
+  const handleConfirmStep = async (slotId) => {
     if (!showOtp) {
+      const res = await fetch(SLOT.LOCK_SLOT(slotId), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+
+      if (data?.data?.message) {
+        alert(data.data.message);
+      }
+
       setShowOtp(true);
+      return;
     } else {
       if (otp === "1234") {
         alert("Appointment booked successfully");
@@ -87,20 +101,21 @@ export default function AppointmentModal({ doctor, show, onClose }) {
                     {slots.length > 0 ? (
                     slots.map((slot) => {
                         const isBooked = slot.booked === true;
+                        const isLocked = slot.locked === true;
 
                         return (
                         <label
                             key={slot._id}
                             className={`border rounded-md px-3 py-2 cursor-pointer 
                             ${selectedTime === slot._id ? "bg-green-600 text-white" : ""}
-                            ${isBooked ? "bg-gray-200 text-gray-500 cursor-not-allowed" : ""}
+                            ${isBooked || isLocked ? "bg-gray-200 text-gray-500 cursor-not-allowed" : ""}
                             `}
                         >
                             <input
                             type="radio"
                             name="slot"
                             className="hidden"
-                            disabled={isBooked}
+                            disabled={isBooked || isLocked}
                             onChange={() => setSelectedTime(slot._id)}
                             />
                             {formatSlotDate(slot.startTime)} - {formatSlotDate(slot.endTime)}
@@ -137,7 +152,7 @@ export default function AppointmentModal({ doctor, show, onClose }) {
             <div className="flex justify-end mt-4">
               <button
                 disabled={selectedTime === null}
-                onClick={handleConfirmStep}
+                onClick={() => handleConfirmStep(selectedTime)}
                 className="bg-green-600 text-white px-4 py-2 rounded-md disabled:opacity-50"
               >
                 Next Step
