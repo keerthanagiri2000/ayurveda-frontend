@@ -10,12 +10,14 @@ export default function DoctorsList() {
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(10);
+    const [limit, setLimit] = useState(12);
     const [total, setTotal] = useState(0);
+    const [specialization, setSpecialization] = useState("");
+    const [mode, setMode] = useState("");
 
       const fetchDoctors = async (pageNumber = 1, pageLimit = 12) => {
       try {
-        const response = await fetch(DOCTORS.GET_ACTIVE_DOCTORS_LIST(pageNumber, pageLimit));
+        const response = await fetch(DOCTORS.GET_ACTIVE_DOCTORS_LIST(pageNumber, pageLimit, specialization, mode));
         const data = await response.json();
         setDoctorData(data.data);
         setTotal(data.total);
@@ -28,7 +30,7 @@ export default function DoctorsList() {
 
     useEffect(() => {
       fetchDoctors();
-    }, []);
+    }, [specialization, mode]);
 
     const handlePageChange = (pageNumber) => {
       fetchDoctors(pageNumber);
@@ -44,6 +46,12 @@ export default function DoctorsList() {
      setShowModal(true);
     };
 
+    const clearFilters = () => {
+    setSpecialization("");
+      setMode("");
+      fetchDoctors(1, limit);
+    }
+
   return (
     <div className="w-full pb-12">
       <div className="w-full flex flex-col items-center gap-6">
@@ -57,12 +65,25 @@ export default function DoctorsList() {
               type="text"
               placeholder="Search by Specialization"
               className="border border-md p-2"
+              value={specialization}
+              onChange={(e) => setSpecialization(e.target.value)}
             />
-            <select className="border borde-md p-2">
-              <option>Select Mode</option>
-              <option>Online</option>
-              <option>In-Person</option>
+            <select 
+              className="border borde-md p-2" 
+              value={mode}
+              onChange={(e) => setMode(e.target.value)}
+            >
+              <option value="">Select Mode</option>
+              <option value="online">Online</option>
+              <option value="in_person">In-Person</option>
             </select>
+
+            <button
+              onClick={clearFilters}
+              className="bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2"
+            >
+              Clear Filters
+            </button>
           </div>
         </div>
 
