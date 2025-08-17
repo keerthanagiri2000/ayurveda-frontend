@@ -3,17 +3,35 @@ import Layout from "../../components/layout";
 import { useState, useEffect } from "react";
 import { DOCTORS } from "../../config.js";
 import { formatDate } from "../../utils/formatDate.js";
+import CompactPagination from "../../components/pagination.js";
 
 export default function DoctorsList () {
     const navigate = useNavigate();
     const [doctors, setDoctors] = useState([]);
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [total, setTotal] = useState(0);
+
+    const fetchDoctors = async (pageNumber = 1, pageLimit = 12) => {
+      try {
+        const response = await fetch(DOCTORS.LIST(pageNumber, pageLimit));
+        const data = await response.json();
+        setDoctors(data.data);
+        setTotal(data.total);
+        setPage(data.page);
+        setLimit(data.limit);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
 
     useEffect(() => {
-        fetch(DOCTORS.LIST(1, 10))
-        .then(res => res.json())
-        .then(data => setDoctors(data.data))
-        .catch(error => console.log(error.message))
+      fetchDoctors();
     }, []);
+
+    const handlePageChange = (pageNumber) => {
+      fetchDoctors(pageNumber);
+    };
 
     return (
         <Layout>
@@ -55,6 +73,12 @@ export default function DoctorsList () {
                             ))}
                         </tbody>
                     </table>
+                    <CompactPagination
+                        currentPage={page}
+                        totalItems={total}
+                        limit={limit}
+                        onPageChange={handlePageChange}
+                    />
                 </main>
             </div>
         </Layout>

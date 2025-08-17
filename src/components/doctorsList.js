@@ -2,19 +2,37 @@ import { useEffect, useState } from "react";
 import { DOCTORS } from "../config";
 import AppointmentModal from "./appointmentModal";
 import { useNavigate } from "react-router-dom";
+import CompactPagination from "./pagination";
 
 export default function DoctorsList() {
     const navigate = useNavigate();
     const [doctors, setDoctorData] = useState([]);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [total, setTotal] = useState(0);
+
+      const fetchDoctors = async (pageNumber = 1, pageLimit = 12) => {
+      try {
+        const response = await fetch(DOCTORS.GET_ACTIVE_DOCTORS_LIST(pageNumber, pageLimit));
+        const data = await response.json();
+        setDoctorData(data.data);
+        setTotal(data.total);
+        setPage(data.page);
+        setLimit(data.limit);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
 
     useEffect(() => {
-        fetch(DOCTORS.GET_ACTIVE_DOCTORS_LIST(1, 10))
-        .then((res) => res.json())
-        .then((data) => setDoctorData(data.data))
-        .catch((error) => console.log(error.message));
+      fetchDoctors();
     }, []);
+
+    const handlePageChange = (pageNumber) => {
+      fetchDoctors(pageNumber);
+    };
 
     const handleBookAppointment = (doctor) => {
       const token = localStorage.getItem("authToken");
@@ -76,6 +94,12 @@ export default function DoctorsList() {
             </div>
           ))}
         </div>
+        <CompactPagination
+            currentPage={page}
+            totalItems={total}
+            limit={limit}
+            onPageChange={handlePageChange}
+          />
       </div>
 
        <AppointmentModal

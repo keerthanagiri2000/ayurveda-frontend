@@ -3,17 +3,36 @@ import Layout from "../../components/layout";
 import { useEffect, useState } from "react";
 import { SLOT } from "../../config";
 import { formatDate } from "../../utils/formatDate";
+import CompactPagination from "../../components/pagination";
 
 export default function SlotList () {
     const navigate = useNavigate();
     const [slots, setSlots] = useState([]);
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [total, setTotal] = useState(0);
+
+
+    const fetchSlots = async (pageNumber = 1, pageLimit = 12) => {
+      try {
+        const response = await fetch(SLOT.LIST(pageNumber, pageLimit));
+        const data = await response.json();
+        setSlots(data.data);
+        setTotal(data.total);
+        setPage(data.page);
+        setLimit(data.limit);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
 
     useEffect(() => {
-        fetch(SLOT.LIST(1, 10))
-        .then(res => res.json())
-        .then(data => setSlots(data.data))
-        .catch(error => console.log(error.message))
+      fetchSlots();
     }, []);
+
+    const handlePageChange = (pageNumber) => {
+      fetchSlots(pageNumber);
+    };
 
     return (
         <Layout>
@@ -53,6 +72,13 @@ export default function SlotList () {
                             ))}
                         </tbody>
                     </table>
+
+                    <CompactPagination
+                        currentPage={page}
+                        totalItems={total}
+                        limit={limit}
+                        onPageChange={handlePageChange}
+                    />
                 </main>
             </div>
         </Layout>
