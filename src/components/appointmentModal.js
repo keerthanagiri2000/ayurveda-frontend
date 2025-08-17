@@ -50,6 +50,7 @@ export default function AppointmentModal({ doctor, show, onClose }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
         },
       });
 
@@ -61,7 +62,7 @@ export default function AppointmentModal({ doctor, show, onClose }) {
 
       setShowOtp(true);
     } catch (error) {
-      console.error(error.message);
+      alert(error.message);
     }
   };
 
