@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { SLOT } from "../config";
+import { APPOINTMENT, SLOT } from "../config";
 import { formatSlotDate } from "../utils/formatSlotDate";
 import { formatDateForAPI } from "../utils/formatDateForAPI";
 import { useNavigate } from "react-router-dom";
@@ -67,15 +67,32 @@ export default function AppointmentModal({ doctor, show, onClose }) {
   };
 
 
-  const handleConfirmAppointment = () => {
+  const handleConfirmAppointment = async () => {
       const token = localStorage.getItem("authToken");
+      const user = JSON.parse(localStorage.getItem("user"));
       if (!token) {
         navigate("/login");
         return;
       }
 
       if (otp === "1234") {
-        alert("Appointment booked successfully");
+        const payload = { 
+          userId: user.id,
+          doctorId: doctor._id,
+          slotId: selectedTime,
+        };
+        const res = await fetch(APPOINTMENT.CREATE, {
+          method: "POST",
+          headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        })
+        const data = await res.json()
+        if (data?.success) {
+          alert("Appointment booked successfully");
+        }
         onClose();
       } else {
         alert("Invalid OTP, try again");

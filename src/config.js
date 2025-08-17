@@ -21,5 +21,9 @@ const SLOT = {
 const AUTH = {
     REGISTER: `${API_BASE_URL}/auth/register`,
     LOGIN: `${API_BASE_URL}/auth/login`,
+};
+
+const APPOINTMENT = {
+    CREATE: `${API_BASE_URL}/appointment`,
 }
-export { DOCTORS, SLOT, AUTH };
+export { DOCTORS, SLOT, AUTH, APPOINTMENT };
